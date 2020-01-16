@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupesMaintConsole", "DupesMaintConsole\DupesMaintConsole.csproj", "{83299929-E367-4012-849F-1D2A050EC04E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupesMaintWinForms", "DupesMaintWinForms\DupesMaintWinForms.csproj", "{FC00128B-053C-452B-A5E2-4923D8927370}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83299929-E367-4012-849F-1D2A050EC04E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83299929-E367-4012-849F-1D2A050EC04E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83299929-E367-4012-849F-1D2A050EC04E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83299929-E367-4012-849F-1D2A050EC04E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC00128B-053C-452B-A5E2-4923D8927370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC00128B-053C-452B-A5E2-4923D8927370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC00128B-053C-452B-A5E2-4923D8927370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC00128B-053C-452B-A5E2-4923D8927370}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB3F3F0C-7BCA-437C-9729-C56A093D05E2}
+	EndGlobalSection
+EndGlobal
