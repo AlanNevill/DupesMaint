@@ -60,12 +60,23 @@ namespace DupesMaintWinForms
             // Note the escape character used (@) when specifying the path. 
             try
             {
-                this.pictureBox1.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(@Photo1.TheFileName)));
-                this.pictureBox2.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(@Photo2.TheFileName)));
+                using (MemoryStream stream1 = new MemoryStream(File.ReadAllBytes(@Photo1.TheFileName)))
+                {
+                    this.pictureBox1.Image = Image.FromStream(stream1);
+                    stream1.Dispose();
+                }
+                using (MemoryStream stream2 = new MemoryStream(File.ReadAllBytes(@Photo2.TheFileName)))
+                {
+                    this.pictureBox2.Image = Image.FromStream(stream2);
+                    stream2.Dispose();
+                }
+
+                //this.pictureBox1.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(@Photo1.TheFileName)));
+                //this.pictureBox2.Image = Image.FromStream(new MemoryStream(File.ReadAllBytes(@Photo2.TheFileName)));
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Truncation error - Photo1 {Photo1.TheFileName} or 2 {Photo2.TheFileName} could not be found.");
+                MessageBox.Show($"ERROR\n\r{e.ToString()}");
                 this.Close();
             }
 
@@ -181,7 +192,7 @@ namespace DupesMaintWinForms
         }
 
 
-        private string TargetFolderCheck(CheckSum photo)
+        private static string TargetFolderCheck(CheckSum photo)
         {
             string targetFolder = Program.targetRootFolder;
 
@@ -212,7 +223,7 @@ namespace DupesMaintWinForms
 
 
         // Physically move the file from its source location to the target folder
-        private bool PhotoMove(CheckSum photo, string targetPath)
+        private static bool PhotoMove(CheckSum photo, string targetPath)
         {
             // construct the destPath including the file name
             string[] sourceFolderParts = photo.TheFileName.Split('\\');
@@ -248,6 +259,12 @@ namespace DupesMaintWinForms
             Program.popsModel.SaveChanges();
         }
 
+        private void DisplayPhotos4SHA_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.pictureBox1.Dispose();
+            this.pictureBox2.Dispose();
 
+            GC.Collect();
+        }
     }
 }

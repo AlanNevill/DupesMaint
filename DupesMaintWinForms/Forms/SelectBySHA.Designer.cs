@@ -37,6 +37,8 @@
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.cbFileExt = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.checkSumDupsBindingSource)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -62,7 +64,7 @@
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.dataGridView1.Size = new System.Drawing.Size(791, 608);
+            this.dataGridView1.Size = new System.Drawing.Size(800, 608);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
@@ -109,11 +111,41 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // cbFileExt
+            // 
+            this.cbFileExt.Enabled = false;
+            this.cbFileExt.FormattingEnabled = true;
+            this.cbFileExt.Items.AddRange(new object[] {
+            ".*",
+            ".jpg",
+            ".mov",
+            ".mp4",
+            ".mpg",
+            ".png",
+            ".wav"});
+            this.cbFileExt.Location = new System.Drawing.Point(691, 33);
+            this.cbFileExt.Name = "cbFileExt";
+            this.cbFileExt.Size = new System.Drawing.Size(121, 21);
+            this.cbFileExt.TabIndex = 5;
+            this.cbFileExt.Text = ".*";
+            this.cbFileExt.SelectedIndexChanged += new System.EventHandler(this.cbFileExt_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(614, 36);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(71, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Select FileExt";
+            // 
             // SelectBySHA
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(824, 708);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.cbFileExt);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.dataGridView1);
@@ -142,6 +174,8 @@
         private System.Windows.Forms.ToolStripMenuItem menuFile;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ComboBox cbFileExt;
+        private System.Windows.Forms.Label label1;
     }
 }
 

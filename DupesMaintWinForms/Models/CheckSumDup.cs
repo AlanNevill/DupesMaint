@@ -21,5 +21,8 @@ namespace DupesMaintWinForms
         [Required]
         [StringLength(1)]
         public string ToDelete { get; set; }
+
+        [Required]
+        public string FileExt { get; set;  }
     }
 }

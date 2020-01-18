@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DupesMaintConsole
 {
-    class Program
-    {
+	internal class Program
+	{
 		private static int _count;
-        private static DirectoryInfo _sourceDir;
-        private static Boolean _truncateCheckSum = false;
-        private static readonly Model1 _popsModels = new Model1();
+		private static DirectoryInfo _sourceDir;
+		private static Boolean _truncateCheckSum = false;
+		private static readonly Model1 _popsModels = new Model1();
+		private static System.Diagnostics.Stopwatch _stopwatch;
 
-        static void Main(string[] args)
-        {
-            var mainWatch = System.Diagnostics.Stopwatch.StartNew();
+		private static void Main(string[] args)
+		{
+			_stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
 			if (string.IsNullOrEmpty(args[0]))
 			{
@@ -49,16 +46,15 @@ namespace DupesMaintConsole
 			Clear_CheckSum_CheckSumDupes();
 			ProcessFiles(_sourceDir);
 
-			mainWatch.Stop();
-			Console.WriteLine($"Total execution time: {mainWatch.ElapsedMilliseconds / 1000} seconds");
+			_stopwatch.Stop();
+			Console.WriteLine($"Total execution time: {_stopwatch.ElapsedMilliseconds / 1000} seconds");
 			Console.WriteLine("Finished - press any key to close");
-			_ = Console.ReadLine();
+			Console.ReadLine();
 
 
 		}
 
-
-		static bool ValidateFolder(string folderArg)
+		private static bool ValidateFolder(string folderArg)
 		{
 			// Specify the root directory you want to scan.
 			DirectoryInfo di = new DirectoryInfo(@folderArg);
@@ -84,9 +80,7 @@ namespace DupesMaintConsole
 			}
 		}
 
-
-
-		static void Clear_CheckSum_CheckSumDupes()
+		private static void Clear_CheckSum_CheckSumDupes()
 		{
 
 			// if command line argument 2 is set to true
@@ -101,15 +95,17 @@ namespace DupesMaintConsole
 
 
 		// process all the files matching the pattern in the the source directory tree
-		static void ProcessFiles(DirectoryInfo sourceDir)
+		private static void ProcessFiles(DirectoryInfo sourceDir)
 		{
-			var process100Watch = System.Diagnostics.Stopwatch.StartNew();
+			System.Diagnostics.Stopwatch process100Watch = System.Diagnostics.Stopwatch.StartNew();
+
+			FileInfo[] _files = sourceDir.GetFiles("*", SearchOption.AllDirectories);
 
 			// Process all the jpg files in the source directory tree
-			foreach (FileInfo fi in sourceDir.GetFiles("*.jpg", SearchOption.AllDirectories))
+			foreach (FileInfo fi in _files)
 			{
 				// calculate the SHA string for the file and return with the time taken in ms in a tuple
-				var (SHA, timerMs) = CalcSHA(fi);
+				(string SHA, int timerMs) = CalcSHA(fi);
 
 				// insert row into CheckSum table
 				CheckSum_ins(SHA, fi.FullName, fi.Extension, fi.CreationTimeUtc, fi.DirectoryName, fi.Length, timerMs);
@@ -119,7 +115,10 @@ namespace DupesMaintConsole
 				if (_count % 100 == 0)
 				{
 					process100Watch.Stop();
-					Console.WriteLine($"INFO - {_count} processed in {process100Watch.ElapsedMilliseconds /1000} secs. Processing folder {fi.DirectoryName}");
+					Console.WriteLine($"INFO - {_count}. Last 100 in {process100Watch.ElapsedMilliseconds / 1000} secs. " +
+						$"Completed: {(_count * 100) / _files.Length}%. " +
+						$"Elapsed: {_stopwatch.ElapsedMilliseconds / 60000} min. " +
+						$"Processing folder: {fi.DirectoryName}");
 					process100Watch.Reset();
 					process100Watch.Start();
 				}
@@ -128,7 +127,7 @@ namespace DupesMaintConsole
 
 
 		// insert a new row into the CheckSum table
-		private static void CheckSum_ins(	string mySHA,
+		private static void CheckSum_ins(string mySHA,
 											string fullName,
 											string fileExt,
 											DateTime fileCreateDt,
@@ -137,25 +136,27 @@ namespace DupesMaintConsole
 											int timerMs)
 		{
 			// create the SqlParameters for the stored procedure
-			var _sHA = new SqlParameter("@SHA", mySHA);
-			var _folder = new SqlParameter("@Folder", directoryName);
-			var _theFileName = new SqlParameter("@TheFileName", fullName);
-			var _fileExt = new SqlParameter("@FileExt", fileExt);
-			var _fileSize = new SqlParameter("@FileSize", (int)fileLength);
-			var _fileCreateDt = new SqlParameter("@FileCreateDt", fileCreateDt);
-			var _timerMs = new SqlParameter("@TimerMs", timerMs);
-			var _notes = new SqlParameter("@Notes", DBNull.Value);
+			SqlParameter _sHA = new SqlParameter("@SHA", mySHA);
+			SqlParameter _folder = new SqlParameter("@Folder", directoryName);
+			SqlParameter _theFileName = new SqlParameter("@TheFileName", fullName);
+			SqlParameter _fileExt = new SqlParameter("@FileExt", fileExt);
+			SqlParameter _fileSize = new SqlParameter("@FileSize", (int)fileLength);
+			SqlParameter _fileCreateDt = new SqlParameter("@FileCreateDt", fileCreateDt);
+
+
+			SqlParameter _timerMs = new SqlParameter("@TimerMs", timerMs);
+			SqlParameter _notes = new SqlParameter("@Notes", DBNull.Value);
 
 			// call the stored procedure
 			_popsModels.Database.ExecuteSqlCommand("exec spCheckSum_ins	@SHA, @Folder,	@TheFileName,	@FileExt,   @FileSize,  @FileCreateDt,  @TimerMs,   @notes",
-																		_sHA, _folder,	_theFileName,	_fileExt,   _fileSize,  _fileCreateDt,  _timerMs,   _notes);
+																		_sHA, _folder, _theFileName, _fileExt, _fileSize, _fileCreateDt, _timerMs, _notes);
 		}
 
 
 		// calculate the SHA256 checksum for the file and return it with the elapsed processing time using a tuple
-		static (string SHA, int timerMs) CalcSHA(FileInfo fi)
+		private static (string SHA, int timerMs) CalcSHA(FileInfo fi)
 		{
-			var watch = System.Diagnostics.Stopwatch.StartNew();
+			System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
 
 			FileStream fs = fi.OpenRead();
 			fs.Position = 0;

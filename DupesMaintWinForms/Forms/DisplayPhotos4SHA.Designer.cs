@@ -66,21 +66,21 @@
             // tbPhoto1
             // 
             this.tbPhoto1.Enabled = false;
-            this.tbPhoto1.Font = new System.Drawing.Font("Source Code Pro Medium", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbPhoto1.Location = new System.Drawing.Point(98, 325);
+            this.tbPhoto1.Font = new System.Drawing.Font("Source Code Pro", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbPhoto1.Location = new System.Drawing.Point(98, 310);
             this.tbPhoto1.Multiline = true;
             this.tbPhoto1.Name = "tbPhoto1";
-            this.tbPhoto1.Size = new System.Drawing.Size(267, 58);
+            this.tbPhoto1.Size = new System.Drawing.Size(267, 73);
             this.tbPhoto1.TabIndex = 2;
             // 
             // tbPhoto2
             // 
             this.tbPhoto2.Enabled = false;
-            this.tbPhoto2.Font = new System.Drawing.Font("Source Code Pro Medium", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbPhoto2.Location = new System.Drawing.Point(388, 325);
+            this.tbPhoto2.Font = new System.Drawing.Font("Source Code Pro", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbPhoto2.Location = new System.Drawing.Point(388, 310);
             this.tbPhoto2.Multiline = true;
             this.tbPhoto2.Name = "tbPhoto2";
-            this.tbPhoto2.Size = new System.Drawing.Size(267, 58);
+            this.tbPhoto2.Size = new System.Drawing.Size(267, 73);
             this.tbPhoto2.TabIndex = 3;
             // 
             // label1
@@ -175,6 +175,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "DisplayPhotos4SHA";
             this.Text = "DisplayPhotos4SHA";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DisplayPhotos4SHA_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.statusStrip1.ResumeLayout(false);

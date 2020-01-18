@@ -66,6 +66,12 @@ namespace DupesMaintWinForms
                 .IsFixedLength()
                 .IsUnicode(false);
 
+
+            modelBuilder.Entity<CheckSumDup>()
+                .Property(e => e.FileExt)
+                .IsUnicode(false);
+
+
             modelBuilder.Entity<DupesAction>()
                 .Property(e => e.TheFileName)
                 .IsUnicode(false);
