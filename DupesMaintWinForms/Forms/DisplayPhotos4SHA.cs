@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DupesMaintWinForms
@@ -14,7 +10,7 @@ namespace DupesMaintWinForms
     public partial class DisplayPhotos4SHA : Form
     {
 
-        public popsDataSet.CheckSumDataTable _dupes { get; set; }
+        public popsDataSet.CheckSumDataTable Dupes { get; set; }
 
         public CheckSum[] CheckSums { get; set; }
         public CheckSum Photo1 { get; set; }
@@ -25,47 +21,47 @@ namespace DupesMaintWinForms
 
         public DisplayPhotos4SHA()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
 
         // constructor called by form SelectbySHA passing in the SHA string of the selected duplicates
         public DisplayPhotos4SHA(string SHA)
         {
-            InitializeComponent();
- 
+            this.InitializeComponent();
+
             // query the model for the CheckSum rows with the selected SHA string
             IQueryable<CheckSum> query = Program.popsModel.CheckSums.Where(checkSum => checkSum.SHA == SHA).OrderBy(x => x.Id);
 
             // cast the query to an array of CheckSum rows
             this.CheckSums = query.ToArray();
-            Photo1 = CheckSums[0];
-            Photo2 = CheckSums[1];
+            this.Photo1 = this.CheckSums[0];
+            this.Photo2 = this.CheckSums[1];
             this.toolStripStatusLabel.Text = $"INFO - {this.CheckSums.Length} duplicate photos - {SHA}";
 
             // get the CheckSumDup rows from the db for the 2 photos
-            IQueryable<CheckSumDup> query2 = Program.popsModel.CheckSumDups.Where(a => a.Id == Photo1.Id || a.Id == Photo2.Id).OrderBy(b => b.Id);
+            IQueryable<CheckSumDup> query2 = Program.popsModel.CheckSumDups.Where(a => a.Id == this.Photo1.Id || a.Id == this.Photo2.Id).OrderBy(b => b.Id);
             this.checkSumDups = query2.ToArray();
-            
-            if (this.checkSumDups.Length==1)
+
+            if (this.checkSumDups.Length == 1)
             {
                 this.toolStripStatusLabel.Text = "ERROR - Only 1 photo found for this SHA value.";
                 return;
             }
 
-            this.checkSumDup1 = checkSumDups[0];
-            this.checkSumDup2 = checkSumDups[1];
+            this.checkSumDup1 = this.checkSumDups[0];
+            this.checkSumDup2 = this.checkSumDups[1];
 
 
             // Note the escape character used (@) when specifying the path. 
             try
             {
-                using (MemoryStream stream1 = new MemoryStream(File.ReadAllBytes(@Photo1.TheFileName)))
+                using (MemoryStream stream1 = new MemoryStream(File.ReadAllBytes(this.@Photo1.TheFileName)))
                 {
                     this.pictureBox1.Image = Image.FromStream(stream1);
                     stream1.Dispose();
                 }
-                using (MemoryStream stream2 = new MemoryStream(File.ReadAllBytes(@Photo2.TheFileName)))
+                using (MemoryStream stream2 = new MemoryStream(File.ReadAllBytes(this.@Photo2.TheFileName)))
                 {
                     this.pictureBox2.Image = Image.FromStream(stream2);
                     stream2.Dispose();
@@ -80,18 +76,18 @@ namespace DupesMaintWinForms
                 this.Close();
             }
 
-            this.tbPhoto1.Text = Photo1.TheFileName;
-            this.tbPhoto2.Text = Photo2.TheFileName;
+            this.tbPhoto1.Text = this.Photo1.TheFileName;
+            this.tbPhoto2.Text = this.Photo2.TheFileName;
 
             this.dateTimePhoto1.Format = DateTimePickerFormat.Custom;
             this.dateTimePhoto2.Format = DateTimePickerFormat.Custom;
             this.dateTimePhoto1.CustomFormat = "yyyy-MM-dd hh:mm:ss";
             this.dateTimePhoto2.CustomFormat = "yyyy-MM-dd hh:mm:ss";
-            this.dateTimePhoto1.Value = Photo1.FileCreateDt;
-            this.dateTimePhoto2.Value = Photo2.FileCreateDt;
+            this.dateTimePhoto1.Value = this.Photo1.FileCreateDt;
+            this.dateTimePhoto2.Value = this.Photo2.FileCreateDt;
 
-            this.cbPhoto1.Text = $"Move photo1 with Id {Photo1.Id.ToString()}";
-            this.cbPhoto2.Text = $"Move photo2 with Id {Photo2.Id.ToString()}";
+            this.cbPhoto1.Text = $"Move photo1 with Id {this.Photo1.Id.ToString()}";
+            this.cbPhoto2.Text = $"Move photo2 with Id {this.Photo2.Id.ToString()}";
 
             this.toolStripStatusLabel.Text = $"INFO - {this.CheckSums.Length} photos found for this SHA value.";
         }
@@ -101,39 +97,39 @@ namespace DupesMaintWinForms
         // called from constructor to load the CheckSum photos for the selected SHA into picture boxes ?? how many
         private void LoadCheckSumPhoto()
         {
-            popsDataSet.CheckSumRow photo1 = (popsDataSet.CheckSumRow)_dupes.Rows[0];
-            popsDataSet.CheckSumRow photo2 = (popsDataSet.CheckSumRow)_dupes.Rows[1];
+            popsDataSet.CheckSumRow photo1 = (popsDataSet.CheckSumRow)this.Dupes.Rows[0];
+            popsDataSet.CheckSumRow photo2 = (popsDataSet.CheckSumRow)this.Dupes.Rows[1];
 
             // Note the escape character used (@) when specifying the path.  
-            pictureBox1.Image = Image.FromFile(@photo1.TheFileName);
-            pictureBox2.Image = Image.FromFile(@photo2.TheFileName);
+            this.pictureBox1.Image = Image.FromFile(@photo1.TheFileName);
+            this.pictureBox2.Image = Image.FromFile(@photo2.TheFileName);
 
-            tbPhoto1.Text = photo1.TheFileName;
-            tbPhoto2.Text = photo2.TheFileName;
+            this.tbPhoto1.Text = photo1.TheFileName;
+            this.tbPhoto2.Text = photo2.TheFileName;
 
-            dateTimePhoto1.Format = DateTimePickerFormat.Custom;
-            dateTimePhoto2.Format = DateTimePickerFormat.Custom;
-            dateTimePhoto1.CustomFormat = "yyyy-MM-dd hh:mm:ss";
-            dateTimePhoto2.CustomFormat = "yyyy-MM-dd hh:mm:ss";
-            dateTimePhoto1.Value = photo1.FileCreateDt;
-            dateTimePhoto2.Value = photo2.FileCreateDt;
+            this.dateTimePhoto1.Format = DateTimePickerFormat.Custom;
+            this.dateTimePhoto2.Format = DateTimePickerFormat.Custom;
+            this.dateTimePhoto1.CustomFormat = "yyyy-MM-dd hh:mm:ss";
+            this.dateTimePhoto2.CustomFormat = "yyyy-MM-dd hh:mm:ss";
+            this.dateTimePhoto1.Value = photo1.FileCreateDt;
+            this.dateTimePhoto2.Value = photo2.FileCreateDt;
         }
 
 
         private void cbPhoto1_CheckedChanged(object sender, EventArgs e)
         {
             // move Photo1 in file system from OneDrive Photos folder to target root folder
-            if (!PhotoMove(Photo1))
+            if (!this.PhotoMove(this.Photo1))
             {
-                this.toolStripStatusLabel.Text = $"ERROR - Photo1.id {Photo1.Id} was not moved.";
+                this.toolStripStatusLabel.Text = $"ERROR - Photo1.id {this.Photo1.Id} was not moved.";
                 return;
             }
 
             // if move succeeds then write a new DupesAction row for Photo1
-            DupesAction_Insert(Photo1, Photo2.TheFileName );
+            this.DupesAction_Insert(this.Photo1, this.Photo2.TheFileName);
 
             // delete Photo1 row from CheckSum table and delete Photo1 and Photo2 from CheckSumDups
-            Db_Delete(Photo1, checkSumDup1, checkSumDup2);
+            this.Db_Delete(this.Photo1, this.checkSumDup1, this.checkSumDup2);
 
             // close the form and SelectBySHA form will refresh without the 2 CheckSumDup rows
             this.Close();
@@ -143,17 +139,17 @@ namespace DupesMaintWinForms
         private void cbPhoto2_CheckedChanged(object sender, EventArgs e)
         {
             // move Photo2 in file system from OneDrive Photos folder to target root folder
-            if (!PhotoMove(Photo2))
+            if (!this.PhotoMove(this.Photo2))
             {
-                this.toolStripStatusLabel.Text = $"ERROR - Photo2.id {Photo2.Id} was not moved.";
+                this.toolStripStatusLabel.Text = $"ERROR - Photo2.id {this.Photo2.Id} was not moved.";
                 return;
             }
 
             // if move succeeds then write a new DupesAction row for Photo1
-            DupesAction_Insert(Photo2, Photo1.TheFileName );
+            this.DupesAction_Insert(this.Photo2, this.Photo1.TheFileName);
 
             // delete Photo1 row from CheckSum table and delete Photo1 and Photo2 from CheckSumDups
-            Db_Delete(Photo2, checkSumDup1, checkSumDup2);
+            this.Db_Delete(this.Photo2, this.checkSumDup1, this.checkSumDup2);
 
             // close the form and SelectBySHA form will refresh without the 2 CheckSumDup rows
             this.Close();

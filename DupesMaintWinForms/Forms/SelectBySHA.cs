@@ -73,9 +73,12 @@ namespace DupesMaintWinForms
                 return;
             }
 
-            if (!dataGridView1.SelectedRows[0].Cells["FileExt"].Value.ToString().Equals(".jpg"))
+            string _fileExt = dataGridView1.SelectedRows[0].Cells["FileExt"].Value.ToString();
+            _fileExt = _fileExt.Substring(startIndex: _fileExt.Length - 4);
+
+            if (!_fileExt.Equals(".jpg", StringComparison.OrdinalIgnoreCase) && !_fileExt.Equals(".png", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show($"ERROR - File type {dataGridView1.SelectedRows[0].Cells["FileExt"].Value.ToString()} cannot be displayed.");
+                MessageBox.Show($"ERROR - File type {_fileExt} cannot be displayed.");
                 return;
             }
 

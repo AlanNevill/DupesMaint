@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace DupesMaintConsole
@@ -39,7 +40,7 @@ namespace DupesMaintConsole
 				return;
 			}
 
-			Console.WriteLine($"INFO - target folder is {_sourceDir.FullName}, and truncate tables is: {_truncateCheckSum}.");
+			Console.WriteLine($"INFO - target folder is {_sourceDir.FullName}\n\rTruncate tables is: {_truncateCheckSum}.");
 			Console.WriteLine("INFO - press any key to start processing.");
 			_ = Console.ReadLine();
 
@@ -47,7 +48,7 @@ namespace DupesMaintConsole
 			ProcessFiles(_sourceDir);
 
 			_stopwatch.Stop();
-			Console.WriteLine($"Total execution time: {_stopwatch.ElapsedMilliseconds / 1000} seconds");
+			Console.WriteLine($"Total execution time: {_stopwatch.ElapsedMilliseconds / 60000} mins. # files processed: {_count}.");
 			Console.WriteLine("Finished - press any key to close");
 			Console.ReadLine();
 
