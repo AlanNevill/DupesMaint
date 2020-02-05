@@ -22,7 +22,7 @@ namespace DupesMaintWinForms
         [STAThread]
         static void Main()
         {
-            // instaniate the data model
+            // instantiate the data model
             popsModel = new PopsModel();
 
             Application.EnableVisualStyles();

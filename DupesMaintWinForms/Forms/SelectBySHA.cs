@@ -73,7 +73,7 @@ namespace DupesMaintWinForms
                 return;
             }
 
-            string _fileExt = dataGridView1.SelectedRows[0].Cells["FileExt"].Value.ToString();
+            string _fileExt = this.dataGridView1.SelectedRows[0].Cells["FileExt"].Value.ToString();
             _fileExt = _fileExt.Substring(startIndex: _fileExt.Length - 4);
 
             if (!_fileExt.Equals(".jpg", StringComparison.OrdinalIgnoreCase) && !_fileExt.Equals(".png", StringComparison.OrdinalIgnoreCase))
@@ -83,7 +83,7 @@ namespace DupesMaintWinForms
             }
 
             // get the SHA value from the selected grid row
-            string SHA = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+            string SHA = this.dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
 
             // call DisplayPhotos4SHA passing in the SHA of the selected duplicates
             Form displayPhotos4SHA = new DisplayPhotos4SHA(SHA);
@@ -93,7 +93,7 @@ namespace DupesMaintWinForms
                 displayPhotos4SHA.ShowDialog();
             }
 
-            // refresh the datagrid
+            // refresh the datagrid in case DisplayPhotos4SHA has deleted 2 CheckSumDups rows
             this.dataGridView1.Refresh();
             this.toolStripStatusLabel1.Text = $"{this.dataGridView1.RowCount} CheckSumDups rows.";
         }

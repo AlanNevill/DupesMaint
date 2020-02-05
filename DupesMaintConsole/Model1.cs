@@ -6,8 +6,7 @@ namespace DupesMaintConsole
 
     public partial class Model1 : DbContext
     {
-        public Model1()
-            : base("name=PopsConnection")
+        public Model1() : base("name=PopsConnection")
         {
         }
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -8,101 +10,84 @@ namespace DupesMaintConsole
 {
 	internal class Program
 	{
-		private static int _count;
-		private static DirectoryInfo _sourceDir;
-		private static Boolean _truncateCheckSum = false;
+		//private static int _count;
+		//private static DirectoryInfo _sourceDir;
+		//private static Boolean _truncateCheckSum = false;
 		private static readonly Model1 _popsModels = new Model1();
-		private static System.Diagnostics.Stopwatch _stopwatch;
+		//private static System.Diagnostics.Stopwatch _stopwatch;
 
-		private static void Main(string[] args)
+		private static int Main(string[] args)
 		{
-			_stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-			if (string.IsNullOrEmpty(args[0]))
+			// Uses System.CommandLine beta library
+			// see https://github.com/dotnet/command-line-api/wiki/Your-first-app-with-System.CommandLine
+
+			RootCommand rootCommand = new RootCommand("DupesMaintConsole")
 			{
-				Console.WriteLine("ERROR - the target folder was not specified");
-				return;
-			}
+				new Option("--folder", "The root folder of the tree to scan which must exist, 'F:/Picasa backup/c/photos'.")
+					{
+						Argument = new Argument<DirectoryInfo>().ExistingOnly(),
+						Required = true
+					},
 
-			// check for 2nd argument supplied requesting truncation of CheckSum and CheckSumDups tables
-			if (args.Length == 2)
-			{
-				if (args[1].ToLower() == "true")
-				{
-					_truncateCheckSum = true;
-				}
-			}
+				new Option("--replace", "Replace default (true) or append (false) to the db tables CheckSum & CheckSumDupes.")
+					{
+						Argument = new Argument<bool>(getDefaultValue: () => true),
+						Required = false
+					}
 
-			// check that the root folder exists
-			if (!ValidateFolder(args[0]))
-			{
-				Console.WriteLine("ERROR - the target folder not found.");
-				return;
-			}
+			};
 
-			Console.WriteLine($"INFO - target folder is {_sourceDir.FullName}\n\rTruncate tables is: {_truncateCheckSum}.");
-			Console.WriteLine("INFO - press any key to start processing.");
-			_ = Console.ReadLine();
+			rootCommand.TreatUnmatchedTokensAsErrors = true;
 
-			Clear_CheckSum_CheckSumDupes();
-			ProcessFiles(_sourceDir);
+			// setup the root command handler
+			rootCommand.Handler = CommandHandler.Create((DirectoryInfo folder, bool replace) => {Process(folder, replace);});
 
-			_stopwatch.Stop();
-			Console.WriteLine($"Total execution time: {_stopwatch.ElapsedMilliseconds / 60000} mins. # files processed: {_count}.");
-			Console.WriteLine("Finished - press any key to close");
+			// call the method defined in the handler
+			return rootCommand.InvokeAsync(args).Result;
+		}
+
+
+		public static void Process(DirectoryInfo folder, bool replace)
+		{
+			System.Diagnostics.Stopwatch _stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+			Console.WriteLine($"{DateTime.Now}, INFO - target folder is {folder.FullName}\n\rTruncate tables is: {replace}.");
+			Console.WriteLine($"{DateTime.Now}, INFO - press any key to start processing.");
 			Console.ReadLine();
 
+			if (replace)
+			{
+				Clear_CheckSum_CheckSumDupes();
+			}
 
+			// main processing
+			int fileCount = ProcessFiles(folder);
+
+			_stopwatch.Stop();
+			Console.WriteLine($"{DateTime.Now}, Total execution time: {_stopwatch.ElapsedMilliseconds / 60000} mins. # of files processed: {fileCount}.");
 		}
 
-		private static bool ValidateFolder(string folderArg)
-		{
-			// Specify the root directory you want to scan.
-			DirectoryInfo di = new DirectoryInfo(@folderArg);
-			try
-			{
-				// Determine whether the directory exists.
-				if (di.Exists)
-				{
-					// Indicate that the directory already exists.
-					Console.WriteLine($"INFO - [{di.FullName}] - path exists.");
-					_sourceDir = di;
-					return true;
-				}
-
-				Console.WriteLine($"ERROR - {folderArg} directory does not exist.");
-				return false;
-
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine($"ERROR - The process failed: {e.ToString()}");
-				throw;
-			}
-		}
 
 		private static void Clear_CheckSum_CheckSumDupes()
 		{
-
-			// if command line argument 2 is set to true
-			if (_truncateCheckSum)
-			{
-				// clear the CheckSum and CheckSumDups tables
-				_popsModels.Database.ExecuteSqlCommand("truncate table CheckSum; truncate table CheckSumDups");
-				_popsModels.SaveChanges();
-				Console.WriteLine("INFO - truncate table CheckSum; truncate table CheckSumDup were executed");
-			}
+			// clear the CheckSum and CheckSumDups tables
+			_popsModels.Database.ExecuteSqlCommand("truncate table CheckSum; truncate table CheckSumDups");
+			_popsModels.SaveChanges();
+			Console.WriteLine($"{DateTime.Now}, INFO - sqlcommands truncate table CheckSum; truncate table CheckSumDup were executed");
 		}
 
 
 		// process all the files matching the pattern in the the source directory tree
-		private static void ProcessFiles(DirectoryInfo sourceDir)
+		private static int ProcessFiles(DirectoryInfo folder)
 		{
+			int _count = 0;
+
 			System.Diagnostics.Stopwatch process100Watch = System.Diagnostics.Stopwatch.StartNew();
 
-			FileInfo[] _files = sourceDir.GetFiles("*", SearchOption.AllDirectories);
+			FileInfo[] _files = folder.GetFiles("*", SearchOption.AllDirectories);
 
-			// Process all the jpg files in the source directory tree
+			// Process all the files in the source directory tree
 			foreach (FileInfo fi in _files)
 			{
 				// calculate the SHA string for the file and return with the time taken in ms in a tuple
@@ -116,25 +101,25 @@ namespace DupesMaintConsole
 				if (_count % 100 == 0)
 				{
 					process100Watch.Stop();
-					Console.WriteLine($"INFO - {_count}. Last 100 in {process100Watch.ElapsedMilliseconds / 1000} secs. " +
+					Console.WriteLine($"{DateTime.Now}, INFO - {_count}. Last 100 in {process100Watch.ElapsedMilliseconds / 1000} secs. " +
 						$"Completed: {(_count * 100) / _files.Length}%. " +
-						$"Elapsed: {_stopwatch.ElapsedMilliseconds / 60000} min. " +
 						$"Processing folder: {fi.DirectoryName}");
 					process100Watch.Reset();
 					process100Watch.Start();
 				}
 			}
+			return _count;
 		}
 
 
 		// insert a new row into the CheckSum table
 		private static void CheckSum_ins(string mySHA,
-											string fullName,
-											string fileExt,
-											DateTime fileCreateDt,
-											string directoryName,
-											long fileLength,
-											int timerMs)
+										string fullName,
+										string fileExt,
+										DateTime fileCreateDt,
+										string directoryName,
+										long fileLength,
+										int timerMs)
 		{
 			// create the SqlParameters for the stored procedure
 			SqlParameter _sHA = new SqlParameter("@SHA", mySHA);
@@ -143,14 +128,12 @@ namespace DupesMaintConsole
 			SqlParameter _fileExt = new SqlParameter("@FileExt", fileExt);
 			SqlParameter _fileSize = new SqlParameter("@FileSize", (int)fileLength);
 			SqlParameter _fileCreateDt = new SqlParameter("@FileCreateDt", fileCreateDt);
-
-
 			SqlParameter _timerMs = new SqlParameter("@TimerMs", timerMs);
 			SqlParameter _notes = new SqlParameter("@Notes", DBNull.Value);
 
 			// call the stored procedure
 			_popsModels.Database.ExecuteSqlCommand("exec spCheckSum_ins	@SHA, @Folder,	@TheFileName,	@FileExt,   @FileSize,  @FileCreateDt,  @TimerMs,   @notes",
-																		_sHA, _folder, _theFileName, _fileExt, _fileSize, _fileCreateDt, _timerMs, _notes);
+																		_sHA, _folder, _theFileName,	_fileExt,	_fileSize,	_fileCreateDt,	_timerMs,	_notes);
 		}
 
 

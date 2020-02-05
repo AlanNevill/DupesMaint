@@ -39,6 +39,8 @@ namespace DupesMaintWinForms.Forms
             this.dataGridView.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             this.dataGridView.Columns["GooglePhotosRemoved"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
+            this.dataGridView.Rows[0].Selected = true;
+
             this.toolStripStatusLabel1.Text = $"INFO - Loaded {this.dataGridView.RowCount} dupesActions rows with GooglePhotosRemoved = N";
         }
 
@@ -68,21 +70,28 @@ namespace DupesMaintWinForms.Forms
 
         private void btnBinned_Click(object sender, EventArgs e)
         {
-            if (this.dataGridView.SelectedRows.Count > 0)
+            if (this.dataGridView.SelectedRows.Count == 1)
             {
                 // get the DupesAction row with the selected TheFileName
                 IQueryable<DupesAction> query = Program.popsModel.DupesActions.Where(dupesAction => dupesAction.TheFileName == theFileName);
 
                 DupesAction adupesAction = query.First();
 
-                // if 1 row found then update GooglePhotosRemoved = Y and save the chnage to the DB
+                // if 1 row found then update GooglePhotosRemoved = Y and save the change to the DB
                 if (!string.IsNullOrEmpty(adupesAction.TheFileName))
                 {
+                    // update the db table
                     adupesAction.GooglePhotosRemoved = "Y";
                     Program.popsModel.SaveChanges();
 
-                    // refresh the view
-                    this.dataGridView.Refresh();
+                    // remove the binned row from the datagrid
+                    this.dataGridView.Rows.Remove(this.dataGridView.SelectedRows[0]);
+
+                    // make the first row selected
+                    this.dataGridView.Rows[0].Selected = true;
+
+                    this.toolStripStatusLabel1.Text = $"INFO - {this.dataGridView.RowCount} dupesActions rows with GooglePhotosRemoved = N";
+
                 }
                 else
                 {
