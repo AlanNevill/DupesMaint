@@ -61,7 +61,7 @@ namespace DupesMaintWinForms
         // 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            MessageBox.Show($"ERROR - NOT ENABLED.");
+            _ = MessageBox.Show("ERROR - NOT ENABLED.");
         }
 
 
