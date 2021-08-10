@@ -3,12 +3,11 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 
 namespace DupesMaintConsole
 {
-	internal class Program
+    internal class Program
 	{
 		//private static int _count;
 		//private static DirectoryInfo _sourceDir;
@@ -58,7 +57,10 @@ namespace DupesMaintConsole
 
 			if (replace)
 			{
-				Clear_CheckSum_CheckSumDupes();
+				// clear the CheckSum and CheckSumDups tables
+				_popsModels.Database.ExecuteSqlCommand("truncate table CheckSum; truncate table CheckSumDups");
+				_popsModels.SaveChanges();
+				Console.WriteLine($"{DateTime.Now}, INFO - sqlcommands truncate table CheckSum; truncate table CheckSumDup were executed");
 			}
 
 			// main processing
@@ -66,15 +68,6 @@ namespace DupesMaintConsole
 
 			_stopwatch.Stop();
 			Console.WriteLine($"{DateTime.Now}, Total execution time: {_stopwatch.ElapsedMilliseconds / 60000} mins. # of files processed: {fileCount}.");
-		}
-
-
-		private static void Clear_CheckSum_CheckSumDupes()
-		{
-			// clear the CheckSum and CheckSumDups tables
-			_popsModels.Database.ExecuteSqlCommand("truncate table CheckSum; truncate table CheckSumDups");
-			_popsModels.SaveChanges();
-			Console.WriteLine($"{DateTime.Now}, INFO - sqlcommands truncate table CheckSum; truncate table CheckSumDup were executed");
 		}
 
 
@@ -150,7 +143,7 @@ namespace DupesMaintConsole
 
 			// BitConverter used to put all bytes into one string, hyphen delimited  
 			string bitString = BitConverter.ToString(bytes);
-
+			
 			watch.Stop();
 			//Console.WriteLine($"{fi.Name}, length: {fi.Length}, execution time: {watch.ElapsedMilliseconds} ms");
 
